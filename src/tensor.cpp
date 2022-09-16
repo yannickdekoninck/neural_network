@@ -1,6 +1,8 @@
 #include <algorithm>
 #include "tensor.h"
 
+// Helpers
+
 void NeuralNetwork::Tensor::set_dimensions_and_indexers(unsigned int n_k, unsigned int n_j, unsigned int n_i)
 {
     // Set dimensions and safeguard against 0 dimensions
@@ -20,6 +22,27 @@ void NeuralNetwork::Tensor::set_dimensions_and_indexers(unsigned int n_k, unsign
     indexers[0] = 0;
     indexers[1] = dimensions[0];
     indexers[2] = dimensions[0] * dimensions[1];
+}
+
+bool NeuralNetwork::Tensor::check_valid_two_operants_elementwise(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2)
+{
+    // dimension 0
+    if (tensor_operant_1.dimensions[0] != tensor_operant_2.dimensions[0])
+    {
+        return false;
+    }
+    // dimension 1
+    if (tensor_operant_1.dimensions[1] != tensor_operant_2.dimensions[1])
+    {
+        return false;
+    }
+    // dimension 2
+    if (tensor_operant_1.dimensions[2] != tensor_operant_2.dimensions[2])
+    {
+        return false;
+    }
+
+    return true;
 }
 
 // Main constructor
@@ -75,5 +98,45 @@ void NeuralNetwork::Tensor::set(float value, unsigned int k, unsigned int j, uns
     if (index < total_size)
     {
         values[index] = value;
+    }
+}
+
+// Mathematical operators
+
+void NeuralNetwork::Tensor::add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result)
+{
+    // Check if the involved tensor shapes match
+    if (check_valid_two_operants_elementwise(tensor_operant_1, tensor_operant_2) && check_valid_two_operants_elementwise(tensor_operant_1, result))
+    {
+        // Add up the two tensors
+        unsafe_add(tensor_operant_1, tensor_operant_2, result);
+    }
+}
+
+void NeuralNetwork::Tensor::scale(float scaling_factor, const Tensor &tensor_operant, Tensor &result)
+{
+    if (check_valid_two_operants_elementwise(tensor_operant, result))
+    {
+        unsafe_scale(scaling_factor, tensor_operant, result);
+    }
+}
+
+void NeuralNetwork::Tensor::unsafe_add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result)
+{
+    // Add up two tensors without doing any shape checking
+    // We rely on the code to have checked all of this before
+    for (unsigned int i = 0; i < result.total_size; i++)
+    {
+        result.values[i] = tensor_operant_1.values[i] + tensor_operant_2.values[i];
+    }
+}
+
+void NeuralNetwork::Tensor::unsafe_scale(float scaling_factor, const Tensor &tensor_operant, Tensor &result)
+{
+    // Add up two tensors without doing any shape checking
+    // We rely on the code to have checked all of this before
+    for (unsigned int i = 0; i < result.total_size; i++)
+    {
+        result.values[i] = scaling_factor * tensor_operant.values[i];
     }
 }

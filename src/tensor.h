@@ -38,6 +38,15 @@ namespace NeuralNetwork
         inline void set(float value, unsigned int j, unsigned int i) { return set(value, 0, j, i); };
         void set(float value, unsigned int k, unsigned int j, unsigned int i);
 
+        // Mathematical operators
+
+        static void add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result);
+        static void scale(float scaling_factor, const Tensor &tensor_operant, Tensor &result);
+        inline static void scale(float scaling_factor, Tensor &tensor_operant) { return unsafe_scale(scaling_factor, tensor_operant, tensor_operant); }; // scale in place
+        
+        // utilities
+        static bool check_valid_two_operants_elementwise(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2);
+
     private:
         float *values;              // The actual values
         unsigned int total_size;    // Keeping track of the total size of the tensor
@@ -47,5 +56,10 @@ namespace NeuralNetwork
         // helper methods
 
         void set_dimensions_and_indexers(unsigned int n_k, unsigned int n_j, unsigned int n_i);
+
+
+        // unsafe math -> doesn't check tensor sizes
+        static void unsafe_add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result);
+        static void unsafe_scale(float scaling_factor, const Tensor &tensor_operant, Tensor &result);
     };
 } // namespace NeuralNetwork
