@@ -1,5 +1,6 @@
 #include "tensor.h"
 #include <iostream>
+#include <chrono>
 
 void main_tensor_multiply()
 {
@@ -11,10 +12,14 @@ void main_tensor_multiply()
 
     t.initialize_value(1.0f);
     t2.initialize_value(7.0f);
-
+    // Timing the execution
+    auto start = std::chrono::high_resolution_clock::now();
     bool success = NeuralNetwork::Tensor::matrix_multiply(t, t2, t3);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 
     std::cout << "Multiplication result status: " << success << std::endl;
+    std::cout << "Time to run multiplication: " << duration.count() << "ms" << std::endl;
 
     std::cout << "The result at index [77,4,25]: " << t3.get(77, 4, 25) << std::endl;
 }
