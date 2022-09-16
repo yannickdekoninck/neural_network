@@ -43,7 +43,8 @@ namespace NeuralNetwork
         static void add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result);
         static void scale(float scaling_factor, const Tensor &tensor_operant, Tensor &result);
         inline static void scale(float scaling_factor, Tensor &tensor_operant) { return unsafe_scale(scaling_factor, tensor_operant, tensor_operant); }; // scale in place
-        
+        static bool matrix_multiply(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result);
+
         // utilities
         static bool check_valid_two_operants_elementwise(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2);
 
@@ -56,10 +57,14 @@ namespace NeuralNetwork
         // helper methods
 
         void set_dimensions_and_indexers(unsigned int n_k, unsigned int n_j, unsigned int n_i);
-
+        inline size_t expand_array_index(unsigned int k, unsigned int j, unsigned int i) const
+        {
+            return i + indexers[1] * j + indexers[2] * k;
+        }
 
         // unsafe math -> doesn't check tensor sizes
         static void unsafe_add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result);
         static void unsafe_scale(float scaling_factor, const Tensor &tensor_operant, Tensor &result);
+        static void unsafe_matrix_multiply(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result);
     };
 } // namespace NeuralNetwork

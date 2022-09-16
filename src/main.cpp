@@ -1,9 +1,26 @@
 #include "tensor.h"
 #include <iostream>
 
-int main(int, char **)
+void main_tensor_multiply()
 {
-    std::cout << "Hello Deep Neural Networks!!!\n\n";
+    std::cout << "Testing out tensor multiplication\n";
+    std::cout << "*********************************\n";
+    NeuralNetwork::Tensor t(100, 50, 70);
+    NeuralNetwork::Tensor t2(100, 16, 50);
+    NeuralNetwork::Tensor t3(100, 16, 70);
+
+    t.initialize_value(1.0f);
+    t2.initialize_value(7.0f);
+
+    bool success = NeuralNetwork::Tensor::matrix_multiply(t, t2, t3);
+
+    std::cout << "Multiplication result status: " << success << std::endl;
+
+    std::cout << "The result at index [77,4,25]: " << t3.get(77, 4, 25) << std::endl;
+}
+
+void main_tensor_basics()
+{
     std::cout << "Testing out some tensor operations\n";
     std::cout << "**********************************\n";
     std::cout << "1) Creating a few tensors of size [2,5,6]" << std::endl;
@@ -28,4 +45,10 @@ int main(int, char **)
     std::cout << "6) Adding up tensors t and t2 and storing the result in t3:" << std::endl;
     NeuralNetwork::Tensor::add(t, t2, t3);
     std::cout << "\tTensor value t3 at index [1,2,3]: " << t3.get(1, 2, 3) << std::endl;
+}
+
+int main(int, char **)
+{
+    std::cout << "Hello Deep Neural Networks!!!\n\n";
+    main_tensor_multiply();
 }
