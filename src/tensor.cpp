@@ -121,6 +121,50 @@ void NeuralNetwork::Tensor::scale(float scaling_factor, const Tensor &tensor_ope
     }
 }
 
+bool NeuralNetwork::Tensor::matrix_multiply(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result)
+{
+
+    // Checks on tensor dimensions
+    // In case any of these tests fails the function returns
+    // TODO: a more user friendly error detection mechanism, at least a logger?
+
+    // Check if last dimensions match
+
+    if (tensor_operant_1.dimensions[2] != tensor_operant_2.dimensions[2])
+    {
+        // no need to look any further
+        return false;
+    }
+    if (tensor_operant_1.dimensions[2] != result.dimensions[2])
+    {
+        // no need to look any further
+        return false;
+    }
+
+    // Check if matrix multiply dimensions match
+
+    if (tensor_operant_1.dimensions[1] != tensor_operant_2.dimensions[0])
+    {
+        return false;
+    }
+
+    // check if result dimensions match
+    if (tensor_operant_1.dimensions[0] != result.dimensions[0])
+    {
+        return false;
+    }
+
+    if (tensor_operant_2.dimensions[1] != result.dimensions[1])
+    {
+        return false;
+    }
+
+    // Passed all tests
+
+    unsafe_matrix_multiply(tensor_operant_1, tensor_operant_2, result);
+    return true;
+}
+
 void NeuralNetwork::Tensor::unsafe_add(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result)
 {
     // Add up two tensors without doing any shape checking
@@ -140,3 +184,34 @@ void NeuralNetwork::Tensor::unsafe_scale(float scaling_factor, const Tensor &ten
         result.values[i] = scaling_factor * tensor_operant.values[i];
     }
 }
+
+namespace NeuralNetwork
+{
+    void Tensor::unsafe_matrix_multiply(const Tensor &tensor_operant_1, const Tensor &tensor_operant_2, Tensor &result)
+    {
+        // Outer matrix multiply loop
+        for (unsigned int k = 0; k < result.dimensions[2]; k++)
+        {
+            for (unsigned int j = 0; j < result.dimensions[1]; j++)
+            {
+                for (unsigned int i = 0; i < result.dimensions[0]; i++)
+                {
+                    float line_sum = 0.0f;
+
+                    for (unsigned int ii = 0; ii < tensor_operant_1.dimensions[1]; ii++)
+                    {
+                        size_t op1_index = tensor_operant_1.expand_array_index(k, ii, i);
+                        size_t op2_index = tensor_operant_2.expand_array_index(k, j, ii);
+
+                        float op1 = tensor_operant_1.values[op1_index];
+                        float op2 = tensor_operant_2.values[op2_index];
+                        line_sum += op1 * op2;
+                    }
+
+                    size_t result_index = result.expand_array_index(k, j, i);
+                    result.values[result_index] = line_sum;
+                }
+            }
+        }
+    }
+} // namespace NeuralNetwork
